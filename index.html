@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<link href="css/mui.css" rel="stylesheet" />
+	</head>
+
+	<body>
+		<header class="mui-bar mui-bar-nav" style="height:50px">
+			<h1 class="mui-title">好友名称</h1>
+			<span class="mui-icon mui-icon-plus headericon"></span>
+		</header>
+		
+		<div class="mui-content">
+			<button type="button" class="mui-btn mui-btn-success" id="gallery">相册</button>
+			<button class="mui-btn mui-btn-blue" id="camera">拍照</button>
+			<button class="mui-btn mui-btn-blue" >这是测试按钮111</button>
+			<div id="galleryP"></div>
+			<div id="cameraP"></div>
+			
+		</div>
+		<script src="js/mui.js"></script>
+		<script type="text/javascript">
+			mui.init();
+			mui.ready(function(){
+				//var view=plus.webview.currentWebview();
+				//mui(".mui-title")[0].innerHTML=view.title;
+				var imgSrc=plus.storage.getItem("imgSrc");
+				if(imgSrc){
+					var imgs=document.createElement('img');
+					imgs.width=200;
+					imgs.height=300;
+					imgs.src=imgSrc;
+					mui("#cameraP")[0].appendChild(imgs);
+					alert( "Capture image success: " + JSON.stringify(plus.io.convertLocalFileSystemURL(path)));//平台URL转化成绝对路径，前面还差个‘file://’
+				}
+				var camera=document.getElementById('camera');
+				camera.addEventListener('tap',function(){
+					var Camera=plus.camera.getCamera(1);
+					Camera.captureImage(function(path){
+						var imgs=document.createElement('img');
+						imgs.width=200;
+						imgs.height=300;
+						imgs.src="file://"+plus.io.convertLocalFileSystemURL(path);
+						mui("#cameraP")[0].appendChild(imgs);
+						alert( "Capture image success: " + JSON.stringify(plus.io.convertLocalFileSystemURL(path)));//平台URL转化成绝对路径，前面还差个‘file://’
+						plus.storage.setItem("imgSrc","file://"+plus.io.convertLocalFileSystemURL(path));
+					})
+					// , function(e){
+					// 	alert( "Capture image failed: " + e.message );
+					// }, {resolution:res,format:fmt});
+				});
+				var gallery=document.getElementById('gallery');
+				gallery.addEventListener('tap',function(){
+					plus.gallery.pick(function(path){
+						//alert(JSON.stringify(path.files));
+						for(var i=0;i<path.files.length;i++){
+							var img =document.createElement('img');
+							img.src=path.files[i];
+							img.width=200;
+							img.height=300;
+							mui("#galleryP")[0].appendChild(img);
+						}
+						
+						
+						
+					},function(){mui.toast('已取消选择图片')},
+					{
+						multiple:true,
+					});
+					
+				})
+			});
+				
+			
+		</script>
+	</body>
+
+</html>
